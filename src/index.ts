@@ -36,7 +36,7 @@ app.use(
   })
 );
 
-app.all("/api/auth/(.*)", toNodeHandler(auth));
+app.use("/api/auth", toNodeHandler(auth));
 
 app.get("/", (req, res) => {
   res.json({ message: "Auth Server is running", status: "OK" });
