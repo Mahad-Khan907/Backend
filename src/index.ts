@@ -5,18 +5,35 @@ import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 import { toNodeHandler } from "better-auth/node";
 
-// 1. DATABASE CONNECTION FROM ENV
+// ==============================
+// DATABASE CONNECTION
+// ==============================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+// ==============================
+// FRONTEND ORIGINS (LOCAL + VERCEL)
+// ==============================
+const FRONTEND_ORIGINS = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "https://physical-ai-better-auth-bymahad.vercel.app",
+];
+
+// ==============================
+// BETTER-AUTH CONFIG
+// ==============================
 const auth = betterAuth({
   database: pool,
-  // 2. FIXED INVALID ORIGIN ERROR
-  trustedOrigins: ["http://localhost:3000", "http://127.0.0.1:3000"], 
+
+  // ✅ TRUST YOUR FRONTENDS
+  trustedOrigins: FRONTEND_ORIGINS,
+
   emailAndPassword: {
     enabled: true,
   },
+
   user: {
     additionalFields: {
       softwareBackground: { type: "string" },
@@ -25,11 +42,14 @@ const auth = betterAuth({
   },
 });
 
+// ==============================
+// EXPRESS APP
+// ==============================
 const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+    origin: FRONTEND_ORIGINS,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -39,10 +59,17 @@ app.use(
 app.use("/api/auth", toNodeHandler(auth));
 
 app.get("/", (req, res) => {
-  res.json({ message: "Auth Server is running", status: "OK" });
+  res.json({
+    status: "OK",
+    message: "Auth Server is running",
+  });
 });
 
-const PORT = 3001;
+// ==============================
+// SERVER START
+// ==============================
+const PORT = process.env.PORT || 3001;
+
 app.listen(PORT, () => {
   console.log(`✅ Auth Server running on http://localhost:${PORT}`);
 });
