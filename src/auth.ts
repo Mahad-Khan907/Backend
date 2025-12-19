@@ -17,5 +17,5 @@ export const auth = betterAuth({
             hardwareBackground: { type: "string", required: false, input: true },
         },
     },
-    trustedOrigins: ["https://physical-ai-better-auth-bymahad.vercel.app/"], // Trust Docusaurus locally
+    trustedOrigins: ["https://physical-ai-better-auth.vercel.app/"], // Trust Docusaurus locally
 });
