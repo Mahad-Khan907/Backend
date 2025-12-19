@@ -1,4 +1,3 @@
-// index.ts (Backend)
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -19,14 +18,12 @@ const auth = betterAuth({
   database: pool,
   trustedOrigins: FRONTEND_ORIGINS,
 
-  // ✅ UPDATED CONFIGURATION
   advanced: {
-    // Better Auth handles the domain automatically based on BETTER_AUTH_URL.
-    // Ensure that your cookies are allowed to be sent cross-site:
-    cookies: {
-        // This ensures cookies are sent over HTTPS and work cross-domain
-        sameSite: "none", 
-        secure: true,
+    // ✅ Fix for TS2559: Use defaultCookieAttributes to set SameSite and Secure
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true, // Required for sameSite: "none"
+      httpOnly: true,
     }
   },
 
@@ -44,7 +41,7 @@ const app = express();
 app.use(
   cors({
     origin: FRONTEND_ORIGINS,
-    credentials: true, // Required for cookies
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
