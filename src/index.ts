@@ -18,7 +18,6 @@ const pool = new Pool({
 const FRONTEND_ORIGINS = [
   "http://localhost:3000",
   "http://127.0.0.1:3000",
-  "https://physical-ai-better-auth-bymahad.vercel.app",
   "https://physical-ai-better-auth.vercel.app",
 ];
 
