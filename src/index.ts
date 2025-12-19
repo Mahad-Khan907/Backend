@@ -12,16 +12,22 @@ const pool = new Pool({
 
 const FRONTEND_ORIGINS = [
   "http://localhost:3000",
-  "https://physical-ai-better-auth.vercel.app", // Your Vercel URL [cite: 631]
+  "https://physical-ai-better-auth.vercel.app",
 ];
 
 const auth = betterAuth({
   database: pool,
-  trustedOrigins: FRONTEND_ORIGINS, // 
+  trustedOrigins: FRONTEND_ORIGINS,
 
-  // ✅ ADDED FOR COOKIES
+  // ✅ UPDATED CONFIGURATION
   advanced: {
-    crossSiteCookies: true, // Required for cross-domain sessions 
+    // Better Auth handles the domain automatically based on BETTER_AUTH_URL.
+    // Ensure that your cookies are allowed to be sent cross-site:
+    cookies: {
+        // This ensures cookies are sent over HTTPS and work cross-domain
+        sameSite: "none", 
+        secure: true,
+    }
   },
 
   emailAndPassword: { enabled: true },
@@ -38,7 +44,7 @@ const app = express();
 app.use(
   cors({
     origin: FRONTEND_ORIGINS,
-    credentials: true, // ✅ Must be true for cookies 
+    credentials: true, // Required for cookies
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -46,6 +52,7 @@ app.use(
 
 app.use("/api/auth", toNodeHandler(auth));
 
-app.listen(process.env.PORT || 3001, () => {
-  console.log(`✅ Auth Server running`);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`✅ Auth Server running on port ${PORT}`);
 });
